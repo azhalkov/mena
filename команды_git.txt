@@ -1,0 +1,386 @@
+ существующий репозиторий из командной строки
+git remote add origin https://github.com/azhalkov/mena.git
+git branch -M main
+git push -u origin main
+
+новый репозиторий в командной строке
+echo "# mena" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/azhalkov/mena.git
+git push -u origin main
+
+_________________________________________
+python3.8 -m venv venv              # Создаю виртуальную среду с версией питона 3.8
+_________________________________________
+source venv/bin/activate            #  Активирую среду
+________________________________________ 
+python --version                    #  Python 3.8.10
+python -m django --version          #  No module named django
+_______________________________________
+/home/andre/mena1.0/venv/bin/python -m pip install --upgrade pip  #  Обновить pip
+_______________________________________
+python -m pip install django        #  Установлю джанго
+
+python -m django --version          # 4.0
+_______________________________________
+django-admin startproject mysite .  #  Установить проект в текущщую папку (точка)
+ls                                  #  manage.py  mysite  venv  команды_git.txt
+_______________________________________
+mkdir progi                         #  Создать папку для приложений
+_______________________________________
+cp -r mysite old_mysite             #  Сохранить копию настроек
+________________________________________
+cp -r mysite seting                 #  Периименовать файл настроек
+________________________________________
+Создать нужные паки для проекта
+mkdir -p templates/account static/account media/account
+___________________________________________________________
+
+cd progi                            #  Перейти в папку с приложениями
+________________________________________________________________
+
+В файлах настроек везде указана пака mysite(изменена на seting)
+
+Было - WSGI_APPLICATION = 'mysite.wsgi.application'
+Стало - WSGI_APPLICATION = 'seting.wsgi.application'
+В файле настроек ROOT_URLCONF  WSGI_APPLICATION 
+в файлах asgi.py wsgi.py
+Ctrl+shift+f  команда в пайчарме найти и заменить
+________________________________________________________________
+ls     #  db.sqlite3  manage.py  media  old_mysite  progi  seting  static  templates  venv  команды_git.txt
+^C(venv) andre@comp-andre:~/mena1.0$ ./manage.py runserver #  При запуске появиться окно приветствия Джанго
+_________________________________________________
+----------------------------------------------------------------
+---------------------- Изменение файла настроек-----------------
+----------------------------------------------------------------
+(venv) andre@comp-andre:~/mena1.0$ python
+
+>>> import os
+>>> os.getcwd()
+'/home/andre/mena1.0'
+>>> os.environ['SECRET_KEY'] = 'django-insecure-54@3gggxt#p(**irjt4o2ccv54_c!)s(lzv#cv7#pk$#g3^@18' # добавил ключ в переменную среду
+>>> exit()
+изменение в файле настроек
+# SECRET_KEY = 'django-insecure-54@3gggxt#p(**irjt4o2ccv54_c!)s(lzv#cv7#pk$#g3^@18'
+SECRET_KEY = os.environ['SECRET_KEY']
+_____________________________________________________________________________________________
+STATIC_ROOT = '/home/andre/mena1.0/static'        Абсолютный путь к каталогу, в котором collectstatic 
+запись в настройкахsettings.py                                                  будут собираться статические файлы для развертывания.
+                                                  Пример: "/var/www/example.com/static/"
+
+(venv) andre@comp-andre:~/mena1.0$ ./manage.py collectstatic
+запуск сбора файлов
+__________________________________________
+STATIC_URL¶
+
+Дефолт: None
+
+URL-адрес для использования при обращении к статическим файлам, расположенным в STATIC_ROOT.
+
+Пример: "static/"или"http://static.example.com/"
+
+STATIC_URL = 'static/'  Запись в файле настроек
+_______________________________________________
+MEDIA_ROOT По умолчанию: ''(Пустая строка) Абсолютный путь файловой cистемы к каталогу, в котором будут храниться файлы, загруженные пользователем .
+Пример: "/var/www/example.com/media/"
+MEDIA_ROOT = 
+_________________________________________
+ИТОГ
+STATIC_ROOT = '/home/andre/mena1.0/static'
+STATIC_URL = 'static/'
+MEDIA_ROOT = '/home/andre/mena1.0/media'
+MEDIA_URL = 'media/'
+_______________________________________________
+----------------Памятка--------------------------
+РАЗДЕЛИТЬ НАСТРОЙКИ ДЛЯ ПРОИЗВОДСТВА И РАЗРАБОТКИ
+_________________________________________________
+
+создаем приложение для пользователя kabinet
+
+ ../manage.py startapp kabinet
+		
+touch kabinet/urls.py
+mkdir templates/kabinet
+---------------------------------------------
+изменил kabinet/apps.py  name = 'progi.kabinet'
+INSTALLED_APPS = [ 'progi.kabinet',
+
+#seting/urls.py
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('progi.kabinet.urls')),
+]
+___________________________________________________
+cd ../templates/kabinet/
+
+touch kabinet.html
+_______________________________
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Кабинет</title>
+</head>
+<body>
+<h1>Кабинет</h1>
+</body>
+</html>
+_______________________________________
+ ./manage.py runserver   ОШИБКА
+django.template.exceptions.TemplateDoesNotExist: kabinet/kabinet.html
+
+
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates/')], ---- внес запись , все нормально
+
+______________________________________________________
+ ./manage.py runserver  Да
+
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+
+
+#  AUTH_USER_MODEL = 'kabinet.User'  добавить в настройках(settings.py)
+
+class User(AbstractUser):
+    pass
+_________________________________________________________
+-------------------------------------------------------
+ Во всех файлах models.py используйте вместо стандартной модели переменную settings.AUTH_USER_MODEL из настроек
+
+    # -*- coding: utf-8 -*-
+     
+    from django.conf import settings
+    from django.db import models
+     
+     
+    class SomeModel(models.Model):
+        user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='User')
+---------------------------------------------------------------------------------
+______________________________________________________________________________________________________
+
+
+
+./manage.py makemigrations kabinet
+
+ ./manage.py migrate
+
+python manage.py createsuperuser --username=joe --email=joe@example.com
+
+Вам будет предложено ввести пароль. После того, как вы введете один, пользователь будет создан немедленно. Если вы оставите опции --usernameили --email, вам будет предложено ввести эти значения.
+
+___________________________________________________
+pip install transliterate
+python -m Pillow --version
+pip install Pillow
+_____________________________________________
+
+# progi/kabinet/models.py
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+from transliterate import slugify
+from django.conf import settings
+
+
+#  AUTH_USER_MODEL = 'progi.
+#  models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='User')
+#  Create your models here.
+from seting.settings import AUTH_USER_MODEL
+
+
+class User(AbstractUser):
+
+    zametka = models.TextField(max_length=500, verbose_name='Заметки',
+                               blank=True, null=True)
+
+    def __str__(self):
+        return self.username
+
+    class Meta:
+        ordering = ['username']
+
+
+class Status(models.Model):
+
+    title = models.CharField('Роль', max_length=100, default='-')
+    is_activ = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = 'Статус'
+        verbose_name_plural = 'Статусы'
+
+
+class Adres(models.Model):
+
+    is_activ = models.BooleanField(verbose_name='Активность', default=False)
+    strana = models.CharField(max_length=80, verbose_name='Страна', default='Россия')
+    gorod = models.CharField(max_length=80, verbose_name='Город', default='Павловская')
+    raion = models.CharField(max_length=80, verbose_name='Район', default='Район')
+    ulica = models.CharField(max_length=80, verbose_name='Улица', default='Улица')
+    n_doma = models.SmallIntegerField(verbose_name='Номер дома № :', default='------')
+    n_podezda = models.SmallIntegerField(verbose_name='Номер подъезда № :', blank=True, null=True)
+    n_kvartiri = models.SmallIntegerField(verbose_name='Номер квартиры № :', blank=True, null=True)
+    pochta_index = models.SmallIntegerField(verbose_name='Почтовый индекс', default='------')
+    zametka = models.CharField(max_length=80, verbose_name='Для заметок', default='-')
+    data_start = models.DateTimeField(verbose_name='Дата подачи', auto_now_add=True, blank=True, null=True)
+    data_stop = models.DateTimeField(verbose_name='Дата снятия', auto_now=True, blank=True, null=True)
+    slug = models.SlugField(verbose_name='Слаг', default='-')
+
+    def __str__(self):
+        return '%s' % self.slug
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify('u-{}_d-{}_p-{}_k-{}'.format(self.ulica, self.n_doma, self.n_podezda, self.n_kvartiri))
+        super(Adres, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'Адрес'
+        verbose_name_plural = 'Адреса'
+
+
+class UserProfile(models.Model):
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    name = models.CharField(max_length=128, verbose_name='Псевдоним', blank=True, null=True)
+    avatar = models.ImageField(verbose_name='Миниатюра', upload_to='image/avatar/', blank=True, null=True)
+
+    def __str__(self):
+        return '%s' % self.name
+
+
+    class Meta:
+        verbose_name = 'Профиль'
+        verbose_name_plural = 'Профили'
+
+_______________________________________________________________________________
+
+
+#  kabinet/admin.py
+
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from django.utils.safestring import mark_safe
+
+from .models import User, Status, Adres, UserProfile
+
+class MyUserAdmin(UserAdmin):
+    model = User
+    list_display = ['username', 'zametka']
+
+
+admin.site.register(User, MyUserAdmin)
+
+
+class StatusAdmin(admin.ModelAdmin):
+    model = Status
+    list_display = ['title', 'is_activ']
+
+
+admin.site.register(Status, StatusAdmin)
+
+
+class AdresAdmin(admin.ModelAdmin):
+    model = Adres
+    exclude = ['zametka']
+    readonly_fields = ["slug"]
+    list_display = ['raion', 'gorod', 'slug']
+
+
+admin.site.register(Adres, AdresAdmin)
+
+
+class UserProfileAdmin(admin.ModelAdmin):
+    model = UserProfile
+    list_display = ['name', 'get_img', 'avatar']
+
+    def get_img(self, obj):
+        return mark_safe(f'<img src="{obj.avatar.url}" width="50">')
+
+
+admin.site.register(UserProfile, UserProfileAdmin)
+
+____________________________________________________________________________________________________
+
+from django import forms
+
+from progi.kabinet.models import Status
+
+
+class StatusForm(forms.ModelForm):
+    title = forms.CharField(max_length=100)
+
+
+    class Meta:
+        model = Status
+        fields = ('title',)
+        template_name = 'kabinet/status_form.html'
+
+___________________________________________________________________________
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="shortcut icon" type="image/png" href="{% media 'image/favicon.ico' %}"/>
+    <title>Кабинет</title>
+</head>
+<body>
+<a href="/admin" >Админ</a>
+<h1>Кабинет</h1>
+</body>
+</html>
+_________________________________________________________________________________________
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
