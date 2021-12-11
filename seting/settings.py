@@ -30,7 +30,10 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
+ROOT_APPS = [
+    'progi.kabinet',
+    'progi.privoz',
+]
 
 
 INSTALLED_APPS = [
@@ -40,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'progi.kabinet',
+    *ROOT_APPS
 ]
 
 MIDDLEWARE = [

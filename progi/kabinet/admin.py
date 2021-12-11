@@ -24,10 +24,10 @@ admin.site.register(Status, StatusAdmin)
 
 class AdresAdmin(admin.ModelAdmin):
     model = Adres
-    exclude = ['zametka']
+    exclude = []
     readonly_fields = ["slug"]
     list_display = ['raion', 'gorod', 'slug']
-
+    save_on_top = True  # В админке появляется сверху блок из трех кнопок дублирует нижний блок с кнопкой сохранить
 
 admin.site.register(Adres, AdresAdmin)
 
